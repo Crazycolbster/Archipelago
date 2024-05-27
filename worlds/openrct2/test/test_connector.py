@@ -35,7 +35,7 @@ class TestConn(unittest.TestCase):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.asynctests())
-    
+
     async def ping(self, data):
         self.gamesock.sendobj(data)
         await asyncio.wait_for(self.ctx.received.wait(), 60)
