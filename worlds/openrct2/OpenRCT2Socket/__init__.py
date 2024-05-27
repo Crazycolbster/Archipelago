@@ -25,6 +25,7 @@ class OpenRCT2Socket:
         self.connected_to_game = asyncio.Event()
         self.initial_connection = True
         self.outbound_packet_queue = []
+        self.inbound_buffer = ''
 
 
     async def main(self):
@@ -134,15 +135,21 @@ class OpenRCT2Socket:
     def _parseReceivedData(self, data:bytes):
         if not data:
             return []
-        print('received', len(data), 'bytes:\n', data)
+        #print('received', len(data), 'bytes:\n', data)
         packets = []
         for packet in data.split(b'\0'):
             packet = packet.decode('UTF-8')
             if packet:
                 try:
                     packets.append(json.loads(packet))
+                    self.inbound_buffer = ''
                 except Exception as e:
-                    logex("partial packet received?", e)
+                    self.inbound_buffer += packet
+                    try:
+                        packets.append(json.loads(self.inbound_buffer))
+                        self.inbound_buffer = ''
+                    except Exception as e:
+                        print("partial packet received?")
         print(packets)
         return packets
 
@@ -150,10 +157,12 @@ class OpenRCT2Socket:
         # time.sleep(0.3)
         try:
             if data:
-                print("DATA")
-                sock = self.gamecons[-1]
+                #print("DATA")
+                sock:socket = None
+                if self.gamecons:
+                    sock = self.gamecons[-1]
                 if sock:
-                    print("SOCK")
+                    #print("SOCK")
                     sock.sendall(data)
                     print('sent', len(data), 'bytes to', sock.getsockname(), '->', sock.getpeername(),':\n', data)
                     data = None

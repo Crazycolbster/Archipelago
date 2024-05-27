@@ -23,6 +23,10 @@ class FakeCtx():
 
 test_network = False
 class TestConn(unittest.TestCase):
+    def subTest(self, msg, **kargs):
+        print('\n=============\nsubTest', msg)
+        return super().subTest(msg, **kargs)
+
     def test_init(self) -> None:
         global test_network
         self.assertTrue(True, "true is true")
@@ -31,33 +35,42 @@ class TestConn(unittest.TestCase):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.asynctests())
-    
+
+    async def ping(self, data):
+        self.gamesock.sendobj(data)
+        await asyncio.wait_for(self.ctx.received.wait(), 60)
+        self.ctx.received.clear()
+        data['cmd'] = 'Pong'
+        last_received = self.ctx.last_received[0]
+        self.assertDictEqual(last_received, data)
+
     async def asynctests(self):
-        ctx = FakeCtx()
-        gamesock = OpenRCT2Socket(ctx)
+        self.ctx = FakeCtx()
+        self.gamesock = OpenRCT2Socket(self.ctx)
+        print('waiting for game connection...')
+        await self.gamesock.connected_to_game.wait()
+
         with self.subTest("small packet"):
-            print('waiting for game connection...')
-            await gamesock.connected_to_game.wait()
-
             data = {'cmd': 'Ping', 'extra': 123}
-            gamesock.sendobj(data)
-            await ctx.received.wait()
-            ctx.received.clear()
-            data['cmd'] = 'Pong'
-            self.assertDictEqual(ctx.last_received[0], data)
+            await self.ping(data)
 
-        with self.subTest("large packet"):
-            print('waiting for game connection...')
-            await gamesock.connected_to_game.wait()
-
+        with self.subTest("medium packet"):
             data = {'cmd': 'Ping', 'extra': 123}
             for i in range(4): # We'll never forget you int()!
                 data["key" + str(i)] = i
-            gamesock.sendobj(data)
-            await ctx.received.wait()
-            ctx.received.clear()
-            data['cmd'] = 'Pong'
-            self.assertDictEqual(ctx.last_received[0], data)
+            await self.ping(data)
+        
+        with self.subTest("larger packet"):
+            data = {'cmd': 'Ping', 'extra': 123}
+            for i in range(2000):
+                data["key" + str(i)] = i
+            await self.ping(data)
+        
+        with self.subTest("largest packet"):
+            data = {'cmd': 'Ping', 'extra': 123}
+            for i in range(42069):
+                data["key" + str(i)] = i
+            await self.ping(data)
 
 def run_tests():
     global test_network
