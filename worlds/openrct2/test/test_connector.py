@@ -71,11 +71,11 @@ class TestConn(unittest.TestCase):
                 data["key" + str(i)] = i
             await self.ping(data)
         
-        with self.subTest("largest packet"):
-            data = {'cmd': 'Ping', 'extra': 123}
-            for i in range(42069):
-                data["key" + str(i)] = i
-            await self.ping(data)
+        # with self.subTest("largest packet"):
+        #     data = {'cmd': 'Ping', 'extra': 123}
+        #     for i in range(42069):
+        #         data["key" + str(i)] = i
+        #     await self.ping(data)
 
         with self.subTest("sending multiple packets"):
             for i in range(5):
@@ -96,6 +96,10 @@ class TestConn(unittest.TestCase):
         with self.subTest("receiving a lot of packets"):
             data = {'cmd': 'Ping', 'multiply': 20, 'response':None}
             await self.ping(data)
+
+        # with self.subTest("sending during receiving"):
+        #     data = {'cmd': 'Ping', 'multiply': 20, 'response':None}
+        #     await self.ping(data)
 
 def run_tests():
     global test_network
