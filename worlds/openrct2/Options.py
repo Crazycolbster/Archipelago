@@ -702,6 +702,15 @@ class ShopMaximumTotalCustomers(Range):
     range_end = 1000
     default = 400
 
+class ShopMaximumTotalRides(Range):
+    """If the shop determines you need a unique ride, this value will be the
+    highest number of that ride that it can ask for.
+    """
+    display_name = "Maximum Shop Total Rides Requirement"
+    range_start = 0
+    range_end = 7
+    default = 7
+
 class BalanceGuestCounts(DefaultOnToggle):
     """Attempts to balance the minimum guest requirements to the ride they're attached to. Low throughput rides
     like Spiral Slides will tend towards the minimum, while high throughput rides like roller coasters will 
@@ -859,6 +868,7 @@ openrct2_option_groups = [
         ShopMaximumLength,
         ShopMinimumTotalCustomers,
         ShopMaximumTotalCustomers,
+        ShopMaximumTotalRides,
         BalanceGuestCounts,
         SelectedVisibility,
         Awards,
@@ -895,6 +905,7 @@ class openRCT2Options(PerGameCommonOptions):
     shop_maximum_length: ShopMaximumLength
     shop_minimum_total_customers: ShopMinimumTotalCustomers
     shop_maximum_total_customers: ShopMaximumTotalCustomers
+    shop_maximum_total_rides: ShopMaximumTotalRides
     balance_guest_counts: BalanceGuestCounts
     awards: Awards
     exclude_safest_park: ExcludeSafestPark
