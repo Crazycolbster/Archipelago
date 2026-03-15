@@ -538,16 +538,16 @@ class OpenRCT2World(World):
                                     length = round(self.random.uniform(self.options.shop_minimum_length.value, 
                                     self.options.shop_maximum_length.value))
                             unlock["RidePrereq"] = \
-                                [self.random.randint(1, 3), chosen_prereq, excitement, intensity, nausea, length, total_customers]
+                                [self.random.randint(1, min(3, self.options.shop_maximum_total_rides.value)), chosen_prereq, excitement, intensity, nausea, length, total_customers]
                         elif (chosen_prereq in item_info["tracked_rides"]
                               and (self.options.scenario_length.value == 0 or #Sync Short
                               self.options.scenario_length.value == 1)):#Sync Long
-                            unlock["RidePrereq"] = [self.random.randint(1, 3), chosen_prereq, 0, 0, 0, 0, total_customers]
+                            unlock["RidePrereq"] = [self.random.randint(1, min(3, self.options.shop_maximum_total_rides.value)), chosen_prereq, 0, 0, 0, 0, total_customers]
                         else:
                             if number > 100:
-                                unlock["RidePrereq"] = [self.random.randint(1, 7), chosen_prereq, 0, 0, 0, 0, total_customers]
+                                unlock["RidePrereq"] = [self.random.randint(1, min(7, self.options.shop_maximum_total_rides.value)), chosen_prereq, 0, 0, 0, 0, total_customers]
                             else: #Even in async games, don't require too many rides too early
-                                unlock["RidePrereq"] = [self.random.randint(1, 3), chosen_prereq, 0, 0, 0, 0, total_customers]
+                                unlock["RidePrereq"] = [self.random.randint(1, min(3, self.options.shop_maximum_total_rides.value)), chosen_prereq, 0, 0, 0, 0, total_customers]
                     else:  # Prereq is not a specific ride
                         category = "ride"
                         category_selected = False
